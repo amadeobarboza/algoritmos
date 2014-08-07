@@ -1,0 +1,27 @@
+// primeron N nùmeros impares.cpp : Defines the entry point for the console application.
+//
+
+#include "stdafx.h"
+#include "conio.h"
+#include <iostream>
+using namespace std;
+int main()
+
+{
+	int N,S,
+		i,cont;
+	cout<<"introducir cuantos numeros suma(N): ";
+	cin >> N;
+	S=0;
+	cont=1;
+	for(i=1;i<=N;i++)
+		{ S=S+cont;
+			cont=cont+2;
+		}
+	cout<<"la suma es: "<<S;
+	getch();
+
+
+	return 0;
+}
+
