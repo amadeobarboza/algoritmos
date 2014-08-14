@@ -1,0 +1,19 @@
+
+//Realizar la suma usando while mientras no se digite un numero negativo
+
+int main(){
+    int n,s;
+    s=0;
+    cout<<"Digite un numero: ";
+    cin>>n;
+    while(n>0){
+        s=s+n;
+        cout<<endl<<"La suma es: "<<s;
+        cout<<endl<<endl<<"ingrese un numero: ";
+        cin>>n;
+    }
+    cout<<endl<<"La suma es: "<<s;
+    getch();
+    return 0;
+}
+ 
