@@ -1,0 +1,68 @@
+#include "stdafx.h"
+#include "math.h"
+#include "iostream"
+#include "conio.h"
+using namespace std;
+void sistemadeecuaciones(float A,float B,float C,float D,float E,float F, float &X, float &Y);
+
+void main (void)
+{
+
+	float A,B,C,D,E,F,X,Y;
+	cout<<"ingrese A:";
+	cin>>A;
+	cout<<"ingrese B:";
+	cin>>B;
+	cout<<"ingrese C:";
+	cin>>C;
+	cout<<"ingrese D:";
+	cin>>D;
+	cout<<"ingrese E:";
+	cin>>E;
+	cout<<"ingrese F:";
+	cin>>F;
+	X = 0;
+	Y = 0 ;
+
+	sistemadeecuaciones( A,B,C,D,E,F,X,Y );
+	if ((X == 0) && (Y == 0))
+		sistemadeecuaciones( A,B,C,D,E,F,X,Y );
+	else 
+	{
+		cout<<"el valor de X es:"<< X ;
+		
+		cout<<"   el valor de Y es:"<< Y;
+	}
+
+	_getch();
+}
+	 
+void sistemadeecuaciones(float A,float B,float C,float D,float E,float F, float &X, float &Y)
+{
+	float det1,det2,det;
+	
+	if((A*E)!= (B*D))
+	{
+		det = (A*E)-(D*B);
+	
+		det1 = (C*E) - (F*B);
+		det2 = (A*F) - (D*C);
+
+		X =  det1/det;
+		Y =  det2/det ;
+
+	}
+	else 
+	{ 
+
+		if((C*E) == (B*F))	
+			cout<<"el sistema tiene infinitas soluciones: ";
+		else 
+			cout<<"el sistema no tiene solucion : ";
+
+	
+	}	
+		
+	
+		
+}
