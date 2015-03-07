@@ -1,0 +1,69 @@
+// P30 Salario Neto vetor.cpp : Defines the entry point for the console application.
+//
+
+#include "stdafx.h"
+#include "conio.h"
+#include <iostream>
+#define TAM 100
+using namespace std;
+
+void cargarVector( float V[],int tam);
+void mostrarVector (float V[],int tam);
+void calculoSalarioNeto(float V[],int tam);
+
+
+void main (void)
+{
+	int tam;
+	float V[TAM];
+	do{
+		cout<<"ingrese el tamano del vector: ";
+		cin>>tam;
+	}while(!(tam > 0));
+	cout<<"intoduciendo los salarios brutos \n";
+	cargarVector( V, tam);
+	// cout<<"mostrando los elementos del vector \n";
+	// mostrarVector ( V, tam);
+	calculoSalarioNeto( V, tam);
+	_getch();
+
+}
+void cargarVector( float V[],int tam)
+{
+	for(int i = 0; i <tam ; i++ )
+	{
+		do{
+			cout<<"V["<<i+1<<"] = ";
+			cin>> V[i];
+		}while(!(V[i] > 1400 ));
+	}
+}
+
+void mostrarVector (float V[],int tam)
+{
+	for(int i = 0; i <tam ; i++ )
+	
+		cout<<"V["<<i+1<<"] = "<<V[i]<<endl;	
+
+}
+void calculoSalarioNeto(float V[],int tam)
+{
+	float prom,S,salarioMinimo,salarioNeto;
+	cout<< " Empleado  Salario Bruto   Salario Neto\n\n";
+	cout<<"--------------------------------------------\n\n";
+	S = 0;
+	salarioMinimo = 1400;
+	for(int i = 0; i <tam ; i++ )
+	{		
+		if( V[i] > 2*salarioMinimo)
+			salarioNeto = V[i] - V[i]*0.13 - V[i]*0.121 ; 
+		else
+			salarioNeto = V[i];
+		cout<< "    "<<i+1 <<"            "<<V[i]<<"              "<<salarioNeto<<endl;
+		S = S + salarioNeto;
+	}
+	cout<<"\n -----------------------------------------------\n\n";
+	cout<<"             El total es :        "<<S<<endl<<endl;
+	prom = S/tam;
+	cout<<"el promedio es :  "<<prom;
+}
