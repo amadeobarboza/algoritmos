@@ -1,0 +1,39 @@
+// P34 Sol Ecu. Cuadratica.cpp : Defines the entry point for the console application.
+//
+
+#include "stdafx.h"
+#include <iostream>  
+#include <math.h>  
+#include "conio.h"
+using namespace std;  
+void EcuacionCuadratica(double a,double b,double c);
+void main(void)
+{ 
+    float a,b,c;  
+	cout<<"Ingresa coeficiente cuadratico a:"<<endl;  
+    cin>>a;  
+	cout<<"Ingresa coeficiente lineal b:"<<endl;  
+    cin>>b;  
+	cout<<"Ingresa constante c:"<<endl;  
+    cin>>c;  
+	 EcuacionCuadratica(a,b,c);
+	_getch();
+    
+} 
+void EcuacionCuadratica(double a,double b,double c)
+{
+
+	double disc=pow(b,2)-4*a*c;  
+		if(a!=0){  
+			if(disc<0){  
+				cout<<"Tiene raices imaginarias";  
+          }else{  
+          double x1=(-b+sqrt(disc))/(2*a);  
+          double x2=(-b-sqrt(disc))/(2*a);  
+          cout<<"X1 = "<<x1<<" X2 = "<<x2;  
+		  _getch();
+        }  
+      }else{  
+     cout<<"El coeficiente cuadratico debe ser diferente de 0";  
+      }   
+}
