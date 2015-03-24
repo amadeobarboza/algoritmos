@@ -1,0 +1,36 @@
+#include "stdafx.h"
+#include <iostream>
+#include <string>
+#include <stdlib.h>
+#include "conio.h"
+#define TAM 50
+using namespace std;
+void main()
+{	
+ int N;
+ string nombres[TAM], nombre, apellido,cadena;
+ unsigned int encontro;
+
+ do{
+    cout<<"Ingrese la cantidad de nombres que desea invertir; ";
+    cin>>N;
+ }while(!(N<=TAM));
+ cin.ignore();
+ for(int i = 0; i < N; i++)
+ {
+   cout<<"Ingrese el "<<i+1<<" nombre: ";
+   getline(cin,nombres[i]);
+	 
+		cadena=nombres[i];
+	encontro = cadena.find(' ' );
+	if(encontro != string::npos )
+	{
+	nombre = nombres[i].substr(0, encontro);
+	apellido = nombres[i].substr(encontro+1,
+	nombres[i].length());
+	cout<<apellido<<", ";
+	cout<<nombre<<endl<<endl;
+	}
+}
+_getch();
+}
