@@ -1,0 +1,232 @@
+
+
+#include "stdafx.h"
+#include "conio.h"
+#include "stdio.h"
+#include <iostream>
+#include "math.h"
+#include <iomanip>
+#define TAM 50
+#define MAX 20
+using namespace std;
+int menu (void);
+int suma(int a,int b);
+void cargar_vector(int A[],int n);
+void mostrar_vector(int A[],int n);
+void ordenar_vector(int A[],int n);
+void cargarMatriz(int A[MAX][MAX],int n,int m);
+void mediaFilas(int A[MAX][MAX],int n,int m);
+void mostrarMatriz(int A[MAX][MAX],int n,int m);
+int menu_menu(void);
+
+void main (void)
+{
+	int op,n,sol,a,b;
+	int A[TAM];
+	do{
+		op = menu ();
+		switch (op)
+		{
+			case 1:
+					cout<<"realizaremos una suma de 2 elemntos\n\n";
+					cout<<"ingrese valor de a: ";
+					cin>>a;
+					cout<<"ingrese valor de b: ";
+					cin>>b;
+					sol = suma(a,b);
+					cout<<"la solucion es : "<<sol;
+				
+					break;
+
+			case 2:
+					cout<<"ordenaremos un vector de manera ascendente\n\n";
+					cout<<"ingrese el tamano del vector: ";
+					cin>>n;
+					cargar_vector(A,n);
+					ordenar_vector(A,n);
+					cout<<"el vector ordenado es"<<endl;
+					mostrar_vector(A,n);
+					break;
+			case 3:
+					cout<<"Determinaremos la media de cada fila de una matriz\n\n";
+					int A[MAX][MAX],n,m;
+					cout<<"ingrese el numero de filas: ";
+					cin>>n;
+					cout<<"ingrese el numero de columnas: ";
+					cin>>m;
+					cargarMatriz(A,n,m);
+					cout<<"la matriz cargada es: \n\n";
+					mostrarMatriz(A,n,m);
+					mediaFilas(A,n,m);
+					break;
+
+			case 4:
+						
+						float a,b;
+							int op;
+							do {
+								op = menu_menu ();
+								switch (op)
+								{
+									case 1:
+										cout<<"leer a:";
+										cin>>a;
+										cout<<"leer b:";
+										cin>>b;
+										break;
+									case 2:
+
+										cout<<"la suma es: "<<a+b;
+										break;
+									case 3:
+										cout<<"la resta es: "<<a-b;
+										break;
+									case 4:
+										cout<<"la multiplicacion es: "<<a*b;
+										break;
+									case 5:
+										if (b ==0)
+											cout<<"no se puede dividir ";
+										else 
+										cout<<"la division es: "<<a/b;
+										break;
+									case 6:
+										cout<<"nos vemos pronto";
+										break;
+
+
+								}
+								_getch();
+							}while (op != 6);
+							
+							break;
+
+
+			case 5:
+					cout<<"fin del programa";
+					break;
+	
+		}
+		_getch();
+
+	}while (op!=5);
+}
+int menu (void)
+{
+	int op;
+	system("cls");
+	cout<<"                                       MENU\n\n";
+	cout<<"1.- mostrar un ejemplo de funcion \n";
+	cout<<"2.- mostrar un ejemplo de vector\n";
+	cout<<"3.- mostrar un ejemplo de matriz\n";
+	cout<<"4.- mostrar un ejemplo de menu dentro del menu\n";
+	cout<<"5.- salir\n\n";
+	do{
+		cout<<"digite opcion :  ";
+		cin>>op;
+
+	}while( !(op>=1) && !(op<=5) );
+	return (op);
+
+}
+//----------------------------------------------------------------------EJEMPLO DE FUNCION
+int suma(int a,int b)
+{
+	int s;
+	s = a + b;
+	return (s);
+
+}
+//------------------------------------------------------------------------EJEMPLO DE VECTORES
+void cargar_vector(int A[],int n)
+{
+	for (int i =0; i<=n;i++)
+	{
+		cout<<"A["<<i+1<<"] = ";
+		cin>>A[i];
+	}
+}
+void mostrar_vector(int A[],int n)
+{
+	for (int i =0; i<=n;i++)
+	{
+		cout<<"A["<<i+1<<"] = "<<A[i]<<endl;
+	}
+}
+void ordenar_vector(int A[],int n)
+{
+	int aux;
+	for (int i =0; i <= n-1; i++)
+		for (int j =0; j<=n-i-1;j++)
+			{
+				if (A[j] > A[j+1])
+				{
+					aux = A[j];
+					A[j] = A[j+1];
+					A[j+1] = aux;
+				}
+			}
+	
+}
+
+//------------------------------------------------------------------------EJEMPLO DE MATRIZES
+
+void cargarMatriz(int A[MAX][MAX],int n,int m)
+{
+	int i,j;
+	for (i=0;i<n;i++)
+		for (j=0;j<m;j++)
+		{
+			cout<<"A["<<i+1<<" , "<<j+1<<"] = ";
+			cin>>A[i][j];
+		}
+
+}
+void mediaFilas(int A[MAX][MAX],int n,int m)
+{
+	int i,j;
+	float S,prom;
+	for (i=0;i<n;i++)
+	{	
+		S=0;
+		for (j=0;j<m;j++)		
+			S = S +A[i][j];
+		prom = S/m;
+		cout<<"media fila "<<i+1<<" =  "<<prom<<endl;
+	}
+
+}
+void mostrarMatriz(int A[MAX][MAX],int n,int m)
+{
+	int i,j;
+	for (i=0;i<n;i++)
+	{
+		for (j=0;j<m;j++)
+		{
+			cout<<setw(5)<<A[i][j];
+		}
+		cout<<endl<<endl;
+	}
+}
+
+//------------------------------------------------------------------------EJEMPLO DE MENU DENTRO DEL MENU
+
+int menu_menu(void)
+{
+	int op;
+	system ("cls");
+	cout<<"            MENU\n\n";
+	cout<<"1.- Introducir datos.\n";
+	cout<<"2.- Suma.\n";
+	cout<<"3.- Resta.\n";
+	cout<<"4.- Multiplicacion.\n";
+	cout<<"5.- Division.\n";
+	cout<<"6.- Salir.\n\n";
+	do{	
+		cout<<"digite opccion : ";
+		cin>>op;
+
+	}while( !((op >= 1) && (op <= 6)) );
+	return (op);
+
+}
