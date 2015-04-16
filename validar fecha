@@ -10,12 +10,12 @@ int main ()
 {
 	int d,m,y,i;
 	bool biciesto = false;
-	cout<<"introduce el dia: ";
-	cin>>d;
-	cout<<"introduce el mes: ";
-	cin>>m;
-	cout<<"introduce el ano: ";
-	cin>>y;
+	// dd/mm/aaaa 
+	string fecha;
+
+	cout<<"introduce la fecha: ";
+	cin>>fecha;
+	d=  fecha[0,1]  //fecha.substr(0,2) //atoi cast
 	if ((y % 4 == 0)&& (y%100!=100)||(y%4==0))
 		biciesto = true;
 	if( (d>0)&&(d<32)&&(m>0)&&(m<13)&&(y>0))
