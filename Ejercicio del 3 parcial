@@ -1,0 +1,173 @@
+
+#include "stdafx.h"
+#include <iostream>
+#include <stdio.h>
+#include <conio.h>
+#include<stdlib.h>
+#include <string>
+using namespace std;
+
+
+struct amigos{
+	int cod;
+	string nombre;
+	int edad;
+};
+void copiar_vec_Arch(amigos v[100],int n);
+void burbuja_Ascen(amigos v[100],int n);
+void copiar_Arch_vec(amigos v[100],int &n);
+void ordenarAscendente(void);
+int menu (void);
+void main (void)
+{
+	
+	int op;
+	FILE *alias;
+	amigos reg;
+	
+	do{
+		op = menu();
+		switch(op) {
+			case 1:
+				cout<<"adicionando registro\n";
+				alias = fopen("amigos.dat","ab+");
+				if (alias == NULL)
+				{
+					cout<<"no existe el archivo";
+					_getch();
+					return;
+				}
+				cout<<"codigo: ";
+				cin>>reg.cod;
+				cin.ignore();
+				cout<<"nombre:";
+				getline(cin,reg.nombre);
+				cout<<"edad: ";
+				cin>>reg.edad;
+				fwrite(&reg,sizeof(amigos),1,alias);
+				fclose(alias);
+				_getch();
+				break;
+
+			case 2: 
+				cout<<"listando registros\n";
+				alias = fopen("amigos.dat","rb");
+				if (alias == NULL)
+				{
+					cout<<"no existe el archivo";
+					_getch();
+					return;
+				}
+				cout<<"codigo         nombre          edad\n\n";
+				fread(&reg,sizeof(amigos),1,alias);
+				while (!feof(alias))
+				{
+					cout<<reg.cod<<"           "<<reg.nombre<<"           "<<reg.edad<<endl;
+					fread(&reg,sizeof(amigos),1,alias);
+
+				}
+				fclose(alias);
+				_getch();
+				break;
+
+			case 3:
+				cout<<"ordenando de manera ascendentemente\n";
+				ordenarAscendente();
+				_getch();
+				break;
+
+				
+		}
+	}while(op!=4);
+	_getch();
+
+}
+int menu (void)
+{
+	int op;
+	system ("cls");
+	cout<<"---------MENU---------\n\n";
+	cout<<"1.-adicionar\n";
+	cout<<"2.-listar\n";
+	cout<<"3.-ordenar\n";
+	cout<<"4.-salir\n\n";
+	
+	cout<<"digite opcion\n";
+	cin>>op;
+	return (op);
+}
+
+void ordenarAscendente(void)
+{
+	amigos v[100];
+	int n; n = 0;
+	copiar_Arch_vec(v,n);
+	burbuja_Ascen(v,n);
+	copiar_vec_Arch(v,n);
+
+}
+void copiar_Arch_vec(amigos v[100],int &n)
+{
+	FILE *alias;
+	amigos reg;
+	alias = fopen("amigos.dat","rb");
+	if(alias == NULL)
+	{
+		cout<<"no existe el archivo";
+		return;
+	}
+	n = 0;
+	fread(&reg,sizeof(amigos),1,alias);
+	while(!feof(alias))
+	{
+		v[n]= reg;
+		n++;
+		fread(&reg,sizeof(amigos),1,alias);
+	}
+	fclose(alias);
+		
+}
+void burbuja_Ascen(amigos v[100],int n)
+{
+	int i,j;
+	amigos aux;
+	for(i = 0; i<n-1; i++)
+	{	for(j=0;j<n-i-1;j++)
+		{
+			if(v[j].edad > v[j+1].edad)
+			{
+				aux = v[j+1];
+				v[j+1] = v[j];
+				v[j]= aux;
+			}
+
+		}
+
+	}
+		
+}
+void copiar_vec_Arch(amigos v[100],int n)
+{
+	int i,con;
+	FILE *alias;
+	amigos reg,aux;
+	
+	alias = fopen("amigos.dat","rb+");
+	if(alias == NULL)
+	{
+		cout<<"no existe el archivo";
+		return;
+	}	
+	for(con =0; con < n; con++)
+	{
+		fseek(alias,con*sizeof(aux),SEEK_SET);
+		aux = v[con];
+		fwrite(&aux,sizeof(aux),1,alias);
+	}
+	
+
+	fclose(alias);
+}
+
+
+
