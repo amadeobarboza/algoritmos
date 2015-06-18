@@ -1,0 +1,62 @@
+#include "stdafx.h"
+#include "conio.h"
+#include <iostream>
+#include <iomanip>
+
+using namespace std;
+#define MAX 20
+void cargarMatriz(int A[MAX][MAX],int nA,int mA);
+void mostrarMatriz(int A[MAX][MAX],int nA,int mA);
+void Transpuesta(int A[MAX][MAX],int B[MAX][MAX],int nA,int mA,int &nB,int &mB);
+
+void main (void)
+{
+	int A[MAX][MAX],B[MAX][MAX],nA,nB,mA,mB;
+	cout<<"ingrese el numero de filas: ";
+	cin>>nA;
+	cout<<"ingrese el numero de columnas: ";
+	cin>>mA;
+	cargarMatriz(A,nA,mA);
+	cout<<"la matriz cargada es: \n\n";
+	mostrarMatriz(A,nA,mA);
+	Transpuesta(A,B,nA,mA,nB,mB);
+	cout<<"\n\nla matriz transpuesta es: \n\n";
+	mostrarMatriz(B,nB,mB);
+	_getch();
+}
+void cargarMatriz(int A[MAX][MAX],int nA,int mA)
+{
+	int i,j;
+	for (i=0;i<nA;i++)
+		for (j=0;j<mA;j++)
+		{
+			cout<<"A["<<i+1<<" , "<<j+1<<"] = ";
+			cin>>A[i][j];
+		}
+
+}
+void Transpuesta(int A[MAX][MAX],int B[MAX][MAX],int nA,int mA,int &nB,int &mB)
+{
+	int i,j;
+	for (i=0;i< nA;i++)
+	{
+		for (j=0;j< mA;j++)
+			B[j][i]= A[i][j] ;
+	}
+	nB = mA ;
+	mB = nA;
+
+}
+void mostrarMatriz(int A[MAX][MAX],int n,int m)
+{
+	int i,j;
+	for (i=0;i<n;i++)
+	{
+		for (j=0;j<m;j++)
+		{
+			cout<<setw(5)<<A[i][j];
+		}
+		cout<<endl;
+	}
+}
+
