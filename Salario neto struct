@@ -1,0 +1,57 @@
+// P58 Salario Neto STRUCT.cpp : Defines the entry point for the console application.
+//
+
+#include "stdafx.h"
+#include "conio.h"
+#include <iostream>
+#include <string>
+
+#define iva 0.13
+#define afp 0.121 
+#define salariominimo 1600
+
+using namespace std;
+
+struct planilla_t{
+	string nombre;
+	string fechadenacimiento;
+	int id;
+	float sb,sn;};
+
+planilla_t p;
+
+void main()
+{
+	int id,n;
+	float sb,sn;
+	cout<<"ingrese el numero de empleados: ";
+	cin>>n;
+	cin.ignore();
+	
+	_getch();
+
+	
+	for(int i=0; i<n;i++)
+	{
+		cout<<"ingrese el nombre del empleado: ";
+		cin.ignore();
+		getline(cin,p.nombre);
+		cout<<"ingrese la fecha de nacimiento: ";
+		cin.ignore();
+		getline (cin,p.fechadenacimiento);
+		cout<<"ingrese su edad: ";
+		cin>>p.id;
+		cout<<"ingrese su salario: ";
+		cin>>p.sb;
+		if(p.sb > 2*salariominimo)
+			p.sn = ( p.sb-(iva*p.sb)-(afp*p.sb));
+		else 
+			p.sn = p.sb ;
+		
+		cout<<p.id<<"\t"<<p.nombre<<"\t"<<p.fechadenacimiento<<"\t"<<p.sb<<"\t"<<p.sn<<"\t";
+
+	}
+	_getch();
+}
+
+
