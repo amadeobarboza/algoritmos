@@ -1,0 +1,82 @@
+
+#include "stdafx.h"
+#include "conio.h"
+#include <iostream>
+#include <iomanip>
+
+using namespace std;
+#define MAX 20
+void cargarMatriz(int A[MAX][MAX],int nA,int mA);
+void mostrarMatriz(int A[MAX][MAX],int nA,int mA);
+void multiplicacion_Matrizes(int A[MAX][MAX],int B[MAX][MAX],int C[MAX][MAX],int nA,int mA,int nB,int mB,int &nC,int &mC);
+
+void main (void)
+{
+	int A[MAX][MAX],B[MAX][MAX],C[MAX][MAX],nA,nB,mA,mB,nC,mC;
+	
+	do{
+		cout<<"ingrese el numero de filas A: ";
+		cin>>nA;
+		cout<<"ingrese el numero de columnas A: ";
+		cin>>mA;
+		cout<<"ingrese el numero de filas B: ";
+		cin>>nB;
+		cout<<"ingrese el numero de columnas B: ";
+		cin>>mB;
+	}while (!(mA=nB));
+	cout<<"cagando la matriz A\n\n";
+	cargarMatriz(A,nA,mA);
+	cout<<"cagando la matriz B\n\n";
+	cargarMatriz(B,nB,mB);
+	cout<<"la matriz A es: \n\n";
+	mostrarMatriz(A,nA,mA);
+	cout<<"la matriz B es: \n\n";
+	mostrarMatriz(B,nB,mB);
+	multiplicacion_Matrizes(A,B,C,nA,mA,nB,mB,nC,mC);
+	cout<<"la multiplicacion de las matrizes es: \n\n";
+	mostrarMatriz(C,nC,mC);
+	_getch();
+}
+void cargarMatriz(int A[MAX][MAX],int nA,int mA)
+{
+	int i,j;
+	for (i=0;i<nA;i++)
+		for (j=0;j<mA;j++)
+		{
+			cout<<"mat["<<i+1<<" , "<<j+1<<"] = ";
+			cin>>A[i][j];
+		}
+
+}
+void multiplicacion_Matrizes(int A[MAX][MAX],int B[MAX][MAX],int C[MAX][MAX],int nA,int mA,int nB,int mB,int &nC,int &mC)
+{
+	int i,j,k,S;
+	for (i=0;i< nA;i++)
+	{
+		for (j=0;j< mB;j++)
+		{
+			S = 0;
+			for (k=0;k< mA;k++)
+			{
+				S = S + ( A[i][k]*B[k][j]);
+			}
+			C[i][j] = S ;
+		}			
+	}
+	nC = nA ;
+	mC = mB;
+
+}
+void mostrarMatriz(int A[MAX][MAX],int n,int m)
+{
+	int i,j;
+	for (i=0;i<n;i++)
+	{
+		for (j=0;j<m;j++)
+		{
+			cout<<setw(5)<<A[i][j];
+		}
+		cout<<endl;
+	}
+}
+
