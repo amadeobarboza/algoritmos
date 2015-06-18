@@ -1,0 +1,74 @@
+
+#include "stdafx.h"
+#include "conio.h"
+#include <iostream>
+#include <iomanip>
+#include "math.h"
+
+using namespace std;
+#define MAX 20
+
+void mostrarMatriz(int A[MAX][MAX],int n,int m);
+void generar_Matriz(int A[MAX][MAX],int n,int m);
+int invertir_num(int num);
+
+void main (void)
+{
+	int A[MAX][MAX],n,m;
+	cout<<"ingrese el numero de filas: ";
+	cin>>n;
+	cout<<"ingrese el numero de columnas: ";
+	cin>>m;
+	generar_Matriz(A,n,m);
+	cout<<"\n\nla matriz generada es: \n\n";
+	mostrarMatriz(A,n,m);
+	_getch();
+}
+void generar_Matriz(int A[MAX][MAX],int n,int m)
+{
+	int i,j,term;
+	term = 1;
+	for (i=0; i<n; i++)
+	{
+		for(j=0; j<m; j++)
+		{
+			if(term <=3)
+				A[i][j] = pow(float( term),2);
+			else 
+			{
+				A[i][j]= invertir_num(pow (float (term),2));
+			}
+			term++;	
+			
+		}
+			
+	}
+
+}
+void mostrarMatriz(int A[MAX][MAX],int n,int m)
+{
+	int i,j;
+	for (i=0;i<n;i++)
+	{
+		for (j=0;j<m;j++)
+		{
+			cout<<setw(5)<<A[i][j];
+		}
+		cout<<endl;
+	}
+}
+
+int invertir_num(int num)
+{
+	int s,dig;
+	s = 0;
+	while(num!=0)
+	{
+		dig = num % 10;
+		s = s*10 + dig;
+		num = int(num/10);
+	}
+	return(s);
+
+}
+
