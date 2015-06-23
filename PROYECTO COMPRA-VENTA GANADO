@@ -1,0 +1,2216 @@
+// Proyecto Final Clientes.cpp: define el punto de entrada de la aplicación de consola.
+//
+
+#include "stdafx.h"
+#include "conio.h"
+#include <iostream>
+#include <string>
+#include <iomanip>
+#include "Clientes.h"
+#include "Caratula.h"
+#include "Proveedores.h"
+#include "Productos.h"
+#include "Compras.h"
+#include "Ventas.h"
+#include "validacion.h"
+#include "Seguridad.h"
+#include "Consultas.h"
+//#include "valdatos.h"
+
+using namespace std;
+//bool validaNumero(string numCad, int &num) ;
+int menuPrincipal (void);
+
+void main ( void )
+{
+	int op;
+	caratula ();
+	inicioSeguridad();	
+	do{
+		op = menuPrincipal ();
+		switch (op)
+		{
+			case 1:	CLIENTES ();
+					break;
+			case 2:	PROVEEDORES ();
+					break;;
+			case 3:	PRODUCTOS ();
+					break;
+			case 4:	COMPRAS ();
+					break;
+			case 5:	VENTAS ();
+					break;
+			case 6:	CONSULTAS ();
+					break;
+			case 7:	SEGURIDAD ();
+					break;
+		}
+	}while ( op != 8 );
+}
+
+int menuPrincipal (void)
+{
+	int opcion;
+	system ("cls");
+	cout << "            MENU PRINCIPAL\n\n";
+	cout << "1. Clientes.\n";
+	cout << "2. Proveedores.\n";
+	cout << "3. Productos.\n";
+	cout << "4. Compras.\n";
+	cout << "5. Ventas.\n";
+	cout << "6. Consultas.\n";
+	cout << "7. Administracion de Claves.\n";
+	cout << "8. Salir.\n\n";
+
+	
+	bool sw;	string numCad;
+	do{	
+		cout << "opcion : ";
+		getline(cin, numCad);
+		sw = validaNumero(numCad, opcion);
+	} while ( ! ( (1 <= opcion) && (opcion <= 8) ) && sw ); 
+
+	return (opcion);
+}
+#include "conio.h"
+#include <iostream>
+#include <string>
+#include <iomanip>
+//#include "seguridad.h"
+
+
+void caratula (void)
+{
+	system ("cls");
+	cout << "            PROYECTO GANADERIA\n\n";
+	cout << "\tINTEGRANTES.\n";
+	cout << "\t\tBruno Maldonado\n";
+	cout << "\t\tAmadeo Barboza\n";
+	cout << "\t\tDiego Rapp\n";
+	cout << "\tCatedratico:\n";
+	cout << "\t\tIng. Karen Infantas\n";
+	cout << "\n";
+	cout << "Santa Cruz\n\n";
+	//adicionaClaveDefecto();
+	system ("pause");
+}
+#include "stdafx.h"
+#include <iostream>
+#include "conio.h"
+#include "iomanip"
+#include <string>
+
+using namespace std;
+
+struct cliente 
+{
+	int cod_clien;
+	string nombre;
+	string CI;
+	string fono;
+	string direccion;
+	bool eli;
+};
+
+//******************************************** PROTOTIPOS ***********************************************
+void CLIENTES (void);
+int menuClientes (void);
+void ADICIONAR_CLIENTES_OK (void);
+void MODIFICAR_CLIENTES_OK (void);
+void BUSCAR_CLIENTES_OK (void);
+void ELIMINAR_CLIENTES_OK (void);
+void MOSTRAR_CLIENTES_OK (void);
+void pedirDatosClien (cliente &reg);
+int generarCodClien (void);
+int busquedaClientes (int codigo, cliente &reg);
+void eliminacionLogica (int pos, cliente reg);
+void eliminacionFisica (int pos, cliente reg);
+void mostrarReg (cliente reg);
+
+bool accesoAdministrador( void );
+bool accesoEmpleado(void);
+bool validarNumero(string numero);
+bool validaNumero(string numero, int &num);
+bool validaFecha(string fecha);
+//******************************************** FUNCIONES ************************************************
+
+void CLIENTES (void)
+{
+	int op;	
+	if(! accesoAdministrador()) {
+		cout << "\n\n\n\n\t\t\t!! NO TIENE ACCESO !!";
+		_getch();
+		return;
+	}
+
+	do{
+		op = menuClientes ();  
+		switch (op)
+		{
+			case 1:	ADICIONAR_CLIENTES_OK ();
+					break;
+			case 2:	MODIFICAR_CLIENTES_OK ();
+					break;
+			case 3:	BUSCAR_CLIENTES_OK ();
+					break;
+			case 4:	ELIMINAR_CLIENTES_OK ();
+					break;
+			case 5:	MOSTRAR_CLIENTES_OK ();
+					break;
+		}
+	}while (op != 6);
+}
+
+
+int menuClientes (void)
+{
+	int opcion;
+	string numCad;
+	system ("cls");
+	cout << "            MENU CLIENTES\n\n";
+	cout << "1. Adicionar Clientes.\n";
+	cout << "2. Modificar Clientes.\n";
+	cout << "3. Buscar Clientes.\n";
+	cout << "4. Eliminar Clientes.\n";
+	cout << "5. Mostrar Clientes.\n";
+	cout << "6. Salir.\n\n";
+	bool sw;
+	do{	
+		cout << "Digite opcion: ";
+		getline(cin, numCad);
+		sw = validaNumero(numCad, opcion);
+	} while ( ! ( (1 <= opcion) && (opcion <= 6) && sw ) ); 
+
+	return (opcion);
+}
+
+
+//************************************************ ADICIONAR *****************************************************************
+
+void ADICIONAR_CLIENTES_OK (void)
+{
+	system ("cls");
+	cout << "            MENU ADICIONAR CLIENTES\n\n";
+	FILE *alias;
+	cliente reg;
+	pedirDatosClien (reg);
+	alias = fopen ("cliente.dat", "ab+");
+	fwrite (&reg, sizeof (cliente), 1, alias);
+	fclose (alias);
+	_getch ();
+}
+
+void pedirDatosClien (cliente &reg)
+{
+	reg.cod_clien = generarCodClien ();
+	cout << "Codigo: " << reg.cod_clien;
+	cin.ignore ();
+	cout << "\n\nNombre: ";
+	getline (cin, reg.nombre);
+	cout << "\nCI: ";
+	getline (cin, reg.CI);
+	cout << "\nTelefono: ";
+	getline (cin, reg.fono);
+	cout << "\nDireccion: ";
+	getline (cin, reg.direccion);
+	reg.eli = false;
+}
+
+int generarCodClien (void)
+{
+	int cod;
+	FILE *ptr;
+	cliente reg;
+	ptr = fopen ("cliente.dat", "rb+");
+	if (ptr == NULL)
+	{
+		cod = 100;
+	}
+	else
+	{
+		fread (&reg, sizeof (cliente), 1, ptr);
+		while (!feof (ptr))
+			fread (&reg, sizeof (cliente), 1, ptr);
+		cod = reg.cod_clien + 1;
+		fclose (ptr);
+	}
+	return (cod);
+}
+
+//***************************************************** MODIFICAR *****************************************************************
+
+void MODIFICAR_CLIENTES_OK (void)
+{
+	int cod, pos;
+	FILE  *alias;
+	cliente reg;
+	system ("cls");
+	cout << "            MENU MODIFICAR CLIENTES\n\n";
+
+	bool sw;	string numCad;
+	do{	
+		cout << "Codigo del Cliente que se va Modificar: ";
+		getline(cin, numCad);
+		sw = validaNumero(numCad, cod);
+	} while ( ! sw ); 
+
+
+	pos = busquedaClientes (cod, reg);
+	if (pos == -1)
+	{
+		cout << "No existe el codigo del Proveedor";
+		_getch();
+		return;
+	}
+	cout << "Codigo\t\tNombre\t\tCI\tTelefono\tDireccion\n\n";
+	mostrarReg (reg);
+	cout << "Codigo: " << reg.cod_clien;
+	cin.ignore ();
+	cout << "\n\nNombre: ";
+	getline (cin, reg.nombre);
+	cout << "\nCI: ";
+	getline (cin, reg.CI);
+	cout << "\nTelefono: ";
+	getline (cin, reg.fono);
+	cout << "\nDireccion: ";
+	getline (cin, reg.direccion);
+	alias = fopen ("cliente.dat", "rb+");
+	fseek (alias, pos*sizeof (reg), SEEK_SET);
+	fwrite (&reg, sizeof (reg), 1, alias);
+	fclose (alias);
+	cout << "Registro Modificado";
+	_getch ();
+}
+
+//*************************************************** BUSCAR ***********************************************************************
+
+void BUSCAR_CLIENTES_OK (void)
+{
+	int codigo, pos;
+	cliente reg;
+	system ("cls");
+	cout << "            MENU BUSCAR CLIENTES\n\n";
+	
+	bool sw;	string numCad;
+	do{	
+		cout << "Digite codigo a busc: ";
+		getline(cin, numCad);
+		sw = validaNumero(numCad, codigo);
+	} while ( ! sw ); 
+
+	pos = busquedaClientes (codigo, reg);
+	if (pos == -1)
+		cout << "No existe el codigo del cliente";
+	else
+			mostrarReg (reg);
+	_getch ();
+}
+
+int busquedaClientes (int codigo, cliente &reg)
+{
+	int posi, con;
+	FILE  *alias;
+	cliente xreg;
+	alias = fopen ("cliente.dat", "rb+");
+	posi = -1;
+	if (alias == NULL)
+			cout << "No Existe Archivo";
+	else
+	{
+		con = 0;
+		fread (&xreg, sizeof (cliente), 1, alias);
+		while (!feof (alias))
+		{
+			if ((xreg.cod_clien == codigo) && (xreg.eli == false))
+			{
+				reg = xreg;
+				posi = con;
+			}
+			fread (&xreg, sizeof (cliente), 1, alias);
+			con++;
+		}
+	}
+	return (posi);
+}
+
+//**************************************** ELIMINAR ******************************************************************
+
+void ELIMINAR_CLIENTES_OK (void)
+{
+	int op, codigo, pos;
+	cliente reg;
+	system ("cls");
+	cout << "            MENU ELIMINAR CLIENTES\n\n";
+	bool sw;	string numCad;
+	do{	
+		cout << "Codigo : ";
+		getline(cin, numCad);
+		sw = validaNumero(numCad, codigo);
+	} while (! sw );
+
+	cout << "Modo de la eliminacion: \n";
+	cout << "   1. Eliminacion Logica: \n";
+	cout << "   2. Eliminacion Fisica: \n\n";
+	
+	do{	
+		cout << "Digite opcion: ";
+		getline(cin, numCad);
+		sw = validaNumero(numCad, op);
+	} while (!((op == 1) || (op == 2) || sw ));
+
+
+	pos = busquedaClientes (codigo, reg);
+	if (pos == -1)
+		cout << "No existe el codigo";
+	else
+	{
+		if (op == 1)
+			eliminacionLogica (pos, reg);
+		else
+			eliminacionFisica (pos, reg);
+		cout << "Eliminacion Exitosa";
+	}
+	_getch ();
+}
+
+void eliminacionLogica (int pos, cliente reg)
+{
+	FILE*alias;
+	alias = fopen ("cliente.dat","rb+");
+	
+	reg.eli = true;
+
+	fseek (alias, pos*sizeof (reg), SEEK_SET);
+	fwrite (&reg, sizeof (cliente), 1, alias);
+	fclose (alias);
+}
+
+void eliminacionFisica (int pos, cliente reg)
+{
+	FILE *p1, *p2;
+	eliminacionLogica (pos, reg);
+	p1 = fopen ("cliente.dat","rb");
+	p2 = fopen ("temporal.dat","wb");
+	fread (&reg, sizeof (cliente), 1, p1);
+	while (!feof (p1))
+	{
+		if (reg.eli == false)
+			fwrite (&reg, sizeof (cliente), 1, p2);
+		fread (&reg, sizeof (cliente), 1, p1);
+	}
+	fclose (p1);
+	fclose (p2);
+	remove ("cliente.dat");
+	rename ("temporal.dat","cliente.dat");
+	remove ("temporal.dat");
+}
+
+
+
+//***************************************************** MOSTRAR *******************************************************************
+
+void MOSTRAR_CLIENTES_OK (void)
+{
+	system ("cls");
+	cout << "            MENU MOSTRAR CLIENTES\n\n";
+	FILE  *alias;
+	cliente reg;
+	alias = fopen ("cliente.dat", "rb");
+	if (alias == NULL)
+	{
+		cout << "No existe el Archivo";
+	}
+	else
+	{
+		cout << "Codigo\t\tNombre\t\tCI\tTelefono\tDireccion\n\n";
+		fread (&reg, sizeof (cliente), 1, alias);
+		while (!feof (alias))
+		{
+			if (reg.eli == false)
+				mostrarReg (reg);
+			fread (&reg, sizeof (cliente), 1, alias);
+		}
+		fclose (alias);
+	}
+	_getch ();
+}
+
+void mostrarReg (cliente reg)
+{
+	cout << setw (7) << reg.cod_clien << setw (18) << reg.nombre << setw (10) << reg.CI << setw (12) << reg.fono << setw (18) << reg.direccion << endl;
+}
+
+int buscarNomCliente (string nombre, cliente &reg)
+{
+	int posi, con;
+	FILE  *alias;
+	cliente xreg;
+	alias = fopen ("cliente.dat", "rb+");
+	posi = -1;
+	if (alias == NULL)
+			cout << "No Existe Archivo";
+	else
+	{
+		con = 0;
+		fread (&xreg, sizeof (cliente), 1, alias);
+		while (!feof (alias))
+		{
+			string s;
+			if (( nombre.compare (xreg.nombre) == 0 ) && (xreg.eli == false))
+			{
+				reg = xreg;
+				posi = con;
+			}
+			fread (&xreg, sizeof (cliente), 1, alias);
+			con++;
+		}
+	}
+	return (posi);
+}
+#include "stdafx.h"
+#include <iostream>
+#include "conio.h"
+#include "iomanip"
+#include <string>
+using namespace std;
+
+struct detalle
+{
+	int codCompra;
+	int codProd;
+	string detalleCom;
+	int pu;
+	int cantidad;
+	int subtotal;
+};
+struct compra 
+{
+	int cod_compras;
+	int nro_comprobante;
+	int cod_prov;  //proveedor
+	string fecha;  
+	int cod_pro;  //producto
+	int PU;
+	int cantidad;
+	bool eli;
+};
+
+//******************************************** PROTOTIPOS ***********************************************
+
+int generarCodComprobante (void);
+bool validarFecha(string fecha);
+int generarCodCompra(void);
+
+//******************************************** MENU PRINCIPAL ***********************************************
+void tituloCompras(int comprobante, string fecha, string nombre, string ci)
+{
+	system("cls");
+	cout << "            MENU COMPRAS\n\n";
+	cout << "\nNro. de comprobante: " << comprobante;
+	cout << "\nFecha              : " << fecha;
+	cout << "\nNombre Proveedor   : " << nombre;
+	cout << "\nNIT                : " << ci<< endl<<endl<<endl;
+	cout<< "Cod_compra    Cod_Prod  Detalle      PU      Canti    Sub \n";
+	cout<< "========================================================= \n\n";
+}
+
+void imprimirDetalle(detalle V[], int n)
+{
+	for(int i = 0; i < n ; i++)
+	{
+		cout<<V[i].codCompra <<"  "<<V[i].codProd<<"  "<<V[i].detalleCom <<"  "<<V[i].pu<<"  "
+			<<V[i].cantidad<<"  "<<V[i].subtotal<<endl;
+	}
+}
+
+void cambiarPreCanProducto(int pos,int precio, int cantidad)
+{
+	FILE  *alias;
+	producto reg;	
+	alias = fopen ("Productos.dat", "rb+");
+	fseek (alias, pos*sizeof (reg), SEEK_SET);
+	fread (&reg, sizeof (reg), 1, alias);
+	fseek (alias, pos*sizeof (reg), SEEK_SET);
+
+	reg.cantidad = reg.cantidad + cantidad;
+	if(reg.PU < precio)
+		reg.PU = precio;
+
+	fwrite (&reg, sizeof (reg), 1, alias);
+	fclose (alias);	
+}
+
+int obtenerRegAdicionado (producto &reg)
+{
+	FILE  *alias;
+	int pos = -1;
+	alias = fopen ("Productos.dat", "rb+");
+	
+	fread (&reg, sizeof (reg), 1, alias);
+	while(!feof(alias))
+	{
+		pos++;
+		fread (&reg, sizeof (reg), 1, alias);
+	}
+	fclose(alias);
+	return(pos);
+}
+int buscarRegAdicionadoProveedor (proveedor &reg)
+{
+	FILE  *alias;
+	int pos = -1;
+	alias = fopen ("proveedor.dat", "rb+");
+	
+	fread (&reg, sizeof (reg), 1, alias);
+	while(!feof(alias))
+	{
+		pos++;
+		fread (&reg, sizeof (reg), 1, alias);
+	}
+	fclose(alias);
+	return(pos);
+}
+
+
+void COMPRAS (void)
+{
+	if(  ! (  accesoAdministrador() || accesoEmpleado() )  ) {
+		cout << "\n\n\n\n\t\t\t!! NO TIENE ACCESO !!";
+		_getch();
+		return;
+	}
+	system("cls");
+	cout << "            MENU COMPRAS\n\n";
+	compra regCompra;	proveedor regProveedor;		string nombre, fecha;
+	
+	int comprobante;
+	comprobante = generarCodComprobante();
+	
+	cout << "Nro. de comprobante: " << comprobante;
+	do{
+		cout << "\nFecha: ";
+		cin.ignore();		getline(cin,fecha);
+	}while (!validarFecha (fecha));
+	
+	cout << "\nNombre Proveedor: ";
+	//cin.ignore ();
+	getline (cin, nombre);
+	int nroReg;
+	if (buscarNomProvee (nombre, regProveedor) == -1)
+	{	ADICIONAR_PROVEEDOR_OK();
+		nroReg = buscarRegAdicionadoProveedor (regProveedor);	
+	}
+	
+	//******************************  detalleCompras  **********************
+	char seguir;	int codCompra, codPro, nroDet = 1;	producto regProducto;
+	detalle V[10];	int n = 0, precio, cantidad, suma = 0;
+	FILE *alias;
+	//int x = fopen_s(&alias,"compras", "ab+");
+
+	do{
+		tituloCompras(comprobante, fecha, regProveedor.nombre, regProveedor.CI);
+		cout << "\ndetalle "<< nroDet << endl;
+		nroDet++;
+		codCompra = generarCodCompra();
+		cout << "Codigo compra : " << codCompra << endl;
+		cout << "Codigo producto : ";	cin >> codPro;
+		
+		if ( busquedaProducto (codPro, regProducto) == -1) {
+			ADICIONAR_PRODUCTO_OK();
+
+			nroReg = obtenerRegAdicionado (regProducto);
+			precio = regProducto.PU;
+			cantidad = regProducto.cantidad;
+		}
+		else{
+			nroReg = busquedaProducto (codPro, regProducto);
+			cout << "Precio Unitario : ";	cin >> precio;
+			cout << "Cantidad        : ";	cin >> cantidad;
+			cambiarPreCanProducto(nroReg, precio, cantidad);
+		}
+		V[n].codCompra  = codCompra;			V[n].codProd    = regProducto.cod_pro;
+		V[n].detalleCom = regProducto.detalle;	V[n].pu         = precio;
+		V[n].cantidad   = cantidad;				V[n].subtotal   = precio * cantidad;
+		suma = suma + V[n].subtotal;			n++;
+		tituloCompras(comprobante, fecha, regProveedor.nombre, regProveedor.CI);
+		imprimirDetalle(V,n);
+
+		regCompra.cod_compras = codCompra;				regCompra.nro_comprobante = comprobante;
+		regCompra.cod_prov = regProveedor.cod_prov;		regCompra.fecha = fecha;
+		regCompra.PU = precio;							regCompra.cantidad = cantidad;
+		regCompra.eli = false;
+		alias = fopen ("compras.dat", "ab+");
+		fwrite(&regCompra,sizeof(compra),1,alias);
+		fclose(alias);
+		do{
+			cout << "Desea continuar comprando (s/n): ";
+			cin >> seguir;
+		}while( (toupper(seguir)!='S') &&  (toupper(seguir)!='N') );
+	}while(toupper(seguir) == 'S');
+	cout <<"                        TOTAL  ---> " << suma<< endl << endl;
+	system ("pause");
+}
+
+//******************************************** FUNCIONES ************************************************
+
+int generarCodCompra(void)
+{
+	int cod;
+	FILE *ptr;
+	compra reg;
+	ptr = fopen ("compras.dat", "rb+");
+	if (ptr == NULL)
+	{
+		cod = 1;
+	}
+	else
+	{
+		fread (&reg, sizeof (compra), 1, ptr);
+		while (!feof (ptr))
+			fread (&reg, sizeof (compra), 1, ptr);
+		cod = reg.cod_compras + 1;
+		fclose (ptr);
+	}
+	return (cod);
+}
+
+
+//********
+int generarCodComprobante (void)
+{
+	int cod;
+	FILE *ptr;
+	compra reg;
+	ptr = fopen ("compras.dat", "rb+");
+	if (ptr == NULL) {
+		cod = 100;
+	}
+	else {
+		fread (&reg, sizeof (compra), 1, ptr);
+		while (!feof (ptr))
+			fread (&reg, sizeof (compra), 1, ptr);
+		//cod = reg.nro_comprobante + 1;
+		cod = reg.nro_comprobante+ 1;
+		fclose (ptr);
+	}
+	return (cod);
+}
+#include "stdafx.h"
+#include <iostream>
+#include "conio.h"
+#include "iomanip"
+#include <string>
+
+using namespace std;
+
+
+//******************************************** PROTOTIPOS ***********************************************
+void reporteCompras(void);
+void reporteVentas(void);
+int menuConsultas (void);
+
+//******************************************** FUNCIONES ************************************************
+
+void CONSULTAS(void)
+{
+	int op;
+	
+	/*	if(! accesoAdministrador()) {
+		cout << "\n\n\n\n\t\t\t!! NO TIENE ACCESO !!";
+		_getch();
+		return;
+	}
+	*/
+	do{
+		op = menuConsultas ();  
+		switch (op)
+		{
+			case 1:	reporteCompras ();
+					break;
+			/*case 2:	reporteVentas ();
+					break;
+			*/
+		}
+	}while (op != 3);
+}
+
+
+int menuConsultas (void)
+{
+	int opcion;
+	system ("cls");
+	cout << "            MENU CONSULTAS\n\n";
+	cout << "1. Compras.\n";
+	cout << "2. Ventas.\n";
+	cout << "3. Salir.\n\n";
+	bool sw;  string numCad;
+	do{	
+		cout << "Digite opcion: ";
+		getline(cin, numCad);
+		sw = validaNumero(numCad, opcion);
+	} while ( ! ( (1 <= opcion) && (opcion <= 3) && sw ) ); 
+
+	return (opcion);
+}
+
+//************************************************ ADICIONAR *****************************************************************
+
+void reporteCompras(void)
+{
+	system ("cls");
+	cout << "            MENU MOSTRAR COMPRAS\n\n";
+	FILE  *alias;
+	compra reg;
+	alias = fopen ("compras.dat", "rb");
+	if (alias == NULL)
+	{
+		cout << "No existe el Archivo";
+	}
+	else
+	{
+		cout << "Cod Compra     nroComprob    Cod Prod   fecha   cantidad      PU\n\n";
+		fread (&reg, sizeof (reg), 1, alias);
+		while (!feof (alias))
+		{
+			if (reg.eli == false)
+				cout << setw (5) <<reg.cod_compras << setw (5) << reg.nro_comprobante << setw (5) 
+				<<reg.cod_pro<< setw (5) << setw (12) << reg.fecha << setw (5) << reg.cantidad << setw (18) << reg.PU << endl;
+			fread (&reg, sizeof (reg), 1, alias);
+		}
+		fclose (alias);
+	}
+	_getch ();
+}
+
+void reporteVentas(void)
+{
+	system ("cls");
+	cout << "            MENU REPORTE VENTAS\n\n";
+	FILE  *alias;
+	venta reg;
+	alias = fopen ("ventas.dat", "rb");
+	if (alias == NULL)
+	{
+		cout << "No existe el Archivo";
+	}
+	else
+	{
+		cout << "Cod Venta     nroComprob    Cod Prod   fecha   cantidad      PU\n\n";
+		fread (&reg, sizeof (reg), 1, alias);
+		while (!feof (alias))
+		{
+			if (reg.eli == false)
+				cout << setw (5) << reg.cod_venta << setw (5) << reg.nro_comprobante << setw (5) 
+				<<reg.cod_cli<< setw (5) << reg.cod_pro<< reg.fecha << setw (12) << reg.cantidad << setw (18) << reg.PU << endl;
+			fread (&reg, sizeof (reg), 1, alias);
+		}
+		fclose (alias);
+	}
+	_getch ();
+}	
+#include "stdafx.h"
+#include <iostream>
+#include "conio.h"
+#include "iomanip"
+#include <string>
+using namespace std;
+
+struct producto
+{
+	int cod_pro;
+	string detalle;
+	float PU;
+	int cantidad;
+	bool eli;
+};
+
+//******************************************** PROTOTIPOS ***********************************************
+void PRODUCTOS (void);
+int menuProducto (void);
+void ADICIONAR_PRODUCTO_OK (void);	
+void MODIFICAR_PRODUCTO_OK (void);				
+void BUSCAR_PRODUCTO_OK (void);
+void ELIMINAR_PRODUCTO_OK (void);
+void MOSTRAR_PRODUCTO_OK (void);
+void pedirDatosPro (producto &reg);
+int generarCodPro (void);
+int busquedaProducto (int codigo, producto &reg);
+void mostrarRegBuscar (producto reg);
+void eliminacionLogica (int pos, producto reg);
+void eliminacionFisica (int pos, producto reg);
+void mostrarReg (producto reg);
+
+
+
+
+//******************************************** MENU PRINCIPAL ************************************************
+
+void PRODUCTOS (void)
+{
+	if(! accesoAdministrador()) {
+		cout << "\n\n\n\n\t\t\t!! NO TIENE ACCESO !!";
+		_getch();
+		return;
+	}
+
+	int op;
+	do{
+		op = menuProducto ();
+		switch (op)
+		{
+			case 1:	ADICIONAR_PRODUCTO_OK ();
+					break;
+			case 2:	MODIFICAR_PRODUCTO_OK ();
+					break;
+			case 3:	BUSCAR_PRODUCTO_OK ();
+					break;
+			case 4:	ELIMINAR_PRODUCTO_OK ();
+					break;
+			case 5:	MOSTRAR_PRODUCTO_OK ();
+					break;
+		}
+	}while (op != 6);
+}
+
+
+//******************************************** FUNCIONES ************************************************
+
+int menuProducto(void)
+{
+	int opcion;
+	system ("cls");
+	cout << "            MENU PRODUCTOS\n\n";
+	cout << "1. Adicionar Producto.\n";
+	cout << "2. Modificar Producto.\n";
+	cout << "3. Buscar Producto.\n";
+	cout << "4. Eliminar Producto.\n";
+	cout << "5. Mostrar Producto.\n";
+	cout << "6. Salir Producto.\n\n";
+
+	do{	
+		cout << "Digite opcion: ";
+		cin >> opcion;
+	} while ( ! ( (1 <= opcion) && (opcion <= 6) ) ); 
+
+	return (opcion);
+}
+
+
+
+
+
+//************************************************ ADICIONAR *****************************************************************
+
+void ADICIONAR_PRODUCTO_OK (void)
+{
+	
+	system ("cls");
+	cout << "            MENU ADICIONAR PRODUCTO\n\n";
+	FILE  *alias;
+	producto reg;
+	pedirDatosPro (reg);
+	alias = fopen ("Productos.dat", "ab+");
+	fwrite (&reg, sizeof (producto), 1, alias);
+	fclose (alias);
+	_getch ();
+}
+
+void pedirDatosPro (producto &reg)
+{
+	reg.cod_pro = generarCodPro ();
+	cout << "Codigo: " << reg.cod_pro;
+	cin.ignore ();
+	cout << "\n\nDetalle: ";
+	getline (cin, reg.detalle);
+	cout << "\nPU: ";
+	cin >> reg.PU;
+	cout << "\nCantidad: ";
+	cin >> reg.cantidad;
+	reg.eli = false;
+}
+
+
+int generarCodPro (void)
+{
+	int cod;
+	FILE *ptr;
+	producto reg;
+	ptr = fopen ("Productos.dat", "rb+");
+	if (ptr == NULL)
+	{
+		cod = 100;
+	}
+	else
+	{
+		fread (&reg, sizeof (producto), 1, ptr);
+		while (!feof (ptr))
+			fread (&reg, sizeof (producto), 1, ptr);
+		cod = reg.cod_pro + 1;
+		fclose (ptr);
+	}
+	return (cod);
+}
+
+
+											
+
+
+//***************************************************** MODIFICAR *****************************************************************
+
+void MODIFICAR_PRODUCTO_OK (void)
+{
+	int cod, pos;
+	FILE  *alias;
+	producto reg;
+	system ("cls");
+	cout << "            MENU MODIFICAR PRODUCTO\n\n";
+	cout << "Codigo del Producto que se va Modificar: ";
+	cin >> cod;
+	pos = busquedaProducto (cod, reg);
+	if (pos == -1)
+	{
+		cout << "No existe el codigo del producto";
+		return;
+	}
+	cout << "Codigo\t\tDetalle\t\tPU\tCantidad\n\n";
+	mostrarReg (reg);
+	cout << "\n\n\nCodigo: " << reg.cod_pro << endl;
+	cin.ignore ();
+	cout << "Detalle: ";
+	getline (cin, reg.detalle);
+	cout << "PU: ";
+	cin >> reg.PU;
+	cout << "Cantidad: ";
+	cin >> reg.cantidad;
+	alias = fopen ("Productos.dat", "rb+");
+	fseek (alias, pos*sizeof (reg), SEEK_SET);
+	fwrite (&reg, sizeof (reg), 1, alias);
+	fclose (alias);
+	cout << "Registro Modificado";
+	_getch ();
+}
+
+
+
+
+
+//*************************************************** BUSCAR ***********************************************************************
+
+void BUSCAR_PRODUCTO_OK (void)
+{
+	int codigo, pos;
+	producto reg;
+	system ("cls");
+	cout << "            MENU BUSCAR PRODUCTO\n\n";
+	cout << "Codigo: ";
+	cin >> codigo;
+	pos = busquedaProducto (codigo, reg);
+	if (pos == -1)
+	{
+		cout << "No existe el codigo del producto";
+	}
+	else
+	{
+			mostrarRegBuscar (reg);
+	}
+	_getch ();
+}
+
+int busquedaProducto (int codigo, producto &reg)
+{
+	int posi, con;
+	FILE  *alias;
+	producto xreg;
+	alias = fopen ("Productos.dat", "rb+");
+	posi = -1;
+	if (alias == NULL)
+			cout << "No Existe Archivo";
+	else
+	{
+		con = 0;
+		fread (&xreg, sizeof (producto), 1, alias);
+		while (!feof (alias))
+		{
+			if ((xreg.cod_pro == codigo) && (xreg.eli == false))
+			{
+				reg = xreg;
+				posi = con;
+			}
+			fread (&xreg, sizeof (producto), 1, alias);
+			con++;
+		}
+	}
+	return (posi);
+}
+
+
+void mostrarRegBuscar (producto reg)
+{
+	cout << setw (7) << reg.cod_pro << setw (18) << reg.detalle << setw (10) << reg.PU << setw (10) << reg.cantidad << endl;
+}
+
+
+
+
+//**************************************** ELIMINAR ******************************************************************
+
+void ELIMINAR_PRODUCTO_OK (void)
+{
+	int op, codigo, pos;
+	producto reg;
+	system ("cls");
+	cout << "            MENU ELIMINAR PRODUCTO\n\n";
+	cout << "Codigo: ";
+	cin >> codigo;
+	cout << "Modo de la eliminacion: \n";
+	cout << "   1. Eliminacion Logica: \n";
+	cout << "   2. Eliminacion Fisica: \n\n";
+	do {
+		cout << "Digite Opcion: ";
+		cin >> op;
+	}while (!((op == 1) || (op == 2)));
+	pos = busquedaProducto (codigo, reg);
+	if (pos == -1)
+		cout << "No existe el codigo";
+	else
+	{
+		if (op == 1)
+			eliminacionLogica (pos, reg);
+		else
+			eliminacionFisica (pos, reg);
+		cout << "Eliminacion Exitosa";
+	}
+	_getch ();
+}
+
+void eliminacionLogica (int pos, producto reg)
+{
+	FILE*alias;
+	alias = fopen ("Productos.dat","rb+");
+	
+	reg.eli = true;
+
+	fseek (alias, pos*sizeof (reg), SEEK_SET);
+	fwrite (&reg, sizeof (producto), 1, alias);
+	fclose (alias);
+}
+
+void eliminacionFisica (int pos, producto reg)
+{
+	FILE *p1, *p2;
+	eliminacionLogica (pos, reg);
+	p1 = fopen ("Productos.dat","rb");
+	p2 = fopen ("temporal.dat","wb");
+	fread (&reg, sizeof (producto), 1, p1);
+	while (!feof (p1))
+	{
+		if (reg.eli == false)
+			fwrite (&reg, sizeof (producto), 1, p2);
+		fread (&reg, sizeof (producto), 1, p1);
+	}
+	fclose (p1);
+	fclose (p2);
+	remove ("Productos.dat");
+	rename ("temporal.dat","Productos.dat");
+	remove ("temporal.dat");
+}
+
+//***************************************************** MOSTRAR *******************************************************************
+
+void MOSTRAR_PRODUCTO_OK (void)
+{
+	system ("cls");
+	cout << "            MENU MOSTRAR PRODUCTO\n\n";
+	FILE  *alias;
+	producto reg;
+	alias = fopen ("Productos.dat", "rb");
+	if (alias == NULL)
+	{
+		cout << "No existe el Archivo";
+	}
+	else
+	{
+		cout << "Codigo\t\tDetalle\t\tPU\tCantidad\n\n";
+		fread (&reg, sizeof (producto), 1, alias);
+		while (!feof (alias))
+		{
+			if (reg.eli == false)
+				mostrarReg (reg);
+			fread (&reg, sizeof (producto), 1, alias);
+		}
+		fclose (alias);
+	}
+	_getch ();
+}
+
+void mostrarReg (producto reg)
+{
+	cout << setw (7) << reg.cod_pro << setw (18) << reg.detalle << setw (10) << reg.PU << setw (10) << reg.cantidad << endl;
+}
+#include "stdafx.h"
+#include <iostream>
+#include "conio.h"
+#include "iomanip"
+#include <string>
+using namespace std;
+
+struct proveedor 
+{
+	int cod_prov;
+	string nombre;
+	string CI;
+	string fono;
+	string direccion;
+	bool eli;
+};
+
+//******************************************** PROTOTIPOS ***********************************************
+void PROVEEDORES (void);
+int menuProveedor(void);
+void ADICIONAR_PROVEEDOR_OK (void);
+void MODIFICAR_PROVEEDOR_OK (void);
+void BUSCAR_PROVEEDOR_OK (void);
+void ELIMINAR_PROVEEDOR_OK (void);
+void MOSTRAR_PROVEEDOR_OK (void);
+void pedirDatosProv (proveedor &reg);
+int generarCodProv (void);
+int busquedaProveedor (int codigo, proveedor &reg);
+void eliminacionLogica (int pos, proveedor reg);
+void eliminacionFisica (int pos, proveedor reg);
+void mostrarReg (proveedor reg);
+int buscarNomProvee (string nombre, proveedor &reg);
+
+//******************************************** MENU PRINCIPAL ***********************************************
+void PROVEEDORES (void)
+{
+	if(! accesoAdministrador()) {
+		cout << "\n\n\n\n\t\t\t!! NO TIENE ACCESO !!";
+		_getch();
+		return;
+	}
+
+	int op;
+	do{
+		op = menuProveedor ();
+		switch (op)
+		{
+			case 1:	ADICIONAR_PROVEEDOR_OK ();
+					break;
+			case 2:	MODIFICAR_PROVEEDOR_OK ();
+					break;
+			case 3:	BUSCAR_PROVEEDOR_OK ();
+					break;
+			case 4:	ELIMINAR_PROVEEDOR_OK ();
+					break;
+			case 5:	MOSTRAR_PROVEEDOR_OK ();
+					break;
+		}
+	}while (op != 6);
+}
+
+//******************************************** FUNCIONES ************************************************
+
+int menuProveedor(void)
+{
+	int opcion;
+	system ("cls");
+	cout << "            MENU PROVEEDOR\n\n";
+	cout << "1. Adicionar Proveedor.\n";
+	cout << "2. Modificar Proveedor.\n";
+	cout << "3. Buscar Proveedor.\n";
+	cout << "4. Eliminar Proveedor.\n";
+	cout << "5. Mostrar Proveedor.\n";
+	cout << "6. Salir.\n\n";
+
+	bool sw;	string numCad;
+	do{	
+		cout << "Digite opcion : ";
+		getline(cin, numCad);
+		sw = validaNumero(numCad, opcion);
+	}  while ( ! ( (1 <= opcion) && (opcion <= 6) && sw ) ); 
+
+	return (opcion);
+}
+
+
+//************************************************ ADICIONAR *****************************************************************
+
+void ADICIONAR_PROVEEDOR_OK (void)
+{ 
+	system ("cls");
+	cout << "            MENU ADICIONAR PROVEEDOR\n\n";
+	FILE *alias;
+	proveedor reg;
+	pedirDatosProv (reg);
+	alias = fopen ("proveedor.dat", "ab+");
+	fwrite (&reg, sizeof (proveedor), 1, alias);
+	fclose (alias);
+	_getch ();
+}
+
+void pedirDatosProv (proveedor &reg)
+{
+	reg.cod_prov = generarCodProv ();
+	cout << "Codigo: " << reg.cod_prov;
+	cin.ignore ();
+	cout << "\n\nNombre: ";
+	getline (cin, reg.nombre);
+	cout << "\nCI: ";
+	getline (cin, reg.CI);
+	cout << "\nTelefono: ";
+	getline (cin, reg.fono);
+	cout << "\nDireccion: ";
+	//cin.ignore ();
+	string xx;
+	getline (cin, xx);
+	reg.direccion = xx;
+	//reg.direccion.copy(xx);
+	reg.eli = false;
+}
+
+
+int generarCodProv (void)
+{
+	int cod;
+	FILE *ptr;
+	proveedor reg;
+	ptr = fopen ("proveedor.dat", "rb+");
+	if (ptr == NULL)
+	{
+		cod = 100;
+	}
+	else
+	{
+		fread (&reg, sizeof (proveedor), 1, ptr);
+		while (!feof (ptr))
+			fread (&reg, sizeof (proveedor), 1, ptr);
+		cod = reg.cod_prov + 1;
+		fclose (ptr);
+	}
+	return (cod);
+}
+
+
+
+
+//***************************************************** MODIFICAR *****************************************************************
+
+void MODIFICAR_PROVEEDOR_OK (void)
+{
+	int cod, pos;
+	FILE  *alias;
+	proveedor reg;
+	system ("cls");
+	cout << "            MENU MODIFICAR PROVEEDOR\n\n";
+	cout << "Codigo del Proveedor que se va Modificar: ";
+	cin >> cod;
+	pos = busquedaProveedor (cod, reg);
+	if (pos == -1)
+	{
+		cout << "No existe el codigo del Proveedor";
+		return;
+	}
+	cout << "Codigo\t\tNombre\t\tCI\tTelefono\tDireccion\n\n";
+	mostrarReg (reg);
+	cout << "Codigo: " << reg.cod_prov;
+	cin.ignore ();
+	cout << "\n\nNombre: ";
+	getline (cin, reg.nombre);
+	cout << "\nCI: ";
+	getline (cin, reg.CI);
+	cout << "\nTelefono: ";
+	getline (cin, reg.fono);
+	cout << "\nDireccion: ";
+	getline (cin, reg.direccion);
+	alias = fopen ("proveedor.dat", "rb+");
+	fseek (alias, pos*sizeof (reg), SEEK_SET);
+	fwrite (&reg, sizeof (reg), 1, alias);
+	fclose (alias);
+	cout << "Registro Modificado";
+	_getch ();
+}
+
+//*************************************************** BUSCAR ***********************************************************************
+
+void BUSCAR_PROVEEDOR_OK (void)
+{
+	int codigo, pos;
+	proveedor reg;
+	system ("cls");
+	cout << "            MENU BUSCAR PROVEEDOR\n\n";
+	
+	bool sw;	string numCad;
+	do{	
+		cout << "Codigo : ";
+		getline(cin, numCad);
+		sw = validaNumero(numCad, codigo);
+	} while (! sw );
+
+	pos = busquedaProveedor (codigo, reg);
+	if (pos == -1)
+		cout << "No existe el codigo del proveedor";
+	else
+			mostrarReg (reg);
+	_getch ();
+}
+
+int busquedaProveedor (int codigo, proveedor &reg)
+{
+	int posi, con;
+	FILE  *alias;
+	proveedor xreg;
+	alias = fopen ("proveedor.dat", "rb+");
+	posi = -1;
+	if (alias == NULL)
+			cout << "No Existe Archivo";
+	else
+	{
+		con = 0;
+		fread (&xreg, sizeof (proveedor), 1, alias);
+		while (!feof (alias))
+		{
+			if ((xreg.cod_prov == codigo) && (xreg.eli == false))
+			{
+				reg = xreg;
+				posi = con;
+			}
+			fread (&xreg, sizeof (proveedor), 1, alias);
+			con++;
+		}
+	}
+	return (posi);
+}
+
+int buscarNomProvee (string nombre, proveedor &reg)
+{
+	int posi, con;
+	FILE  *alias;
+	proveedor xreg;
+	alias = fopen ("proveedor.dat", "rb+");
+	posi = -1;
+	if (alias == NULL)
+			cout << "No Existe Archivo";
+	else
+	{
+		con = 0;
+		fread (&xreg, sizeof (proveedor), 1, alias);
+		while (!feof (alias))
+		{
+			string s;
+			if (( nombre.compare (xreg.nombre) == 0 ) && (xreg.eli == false))
+			{
+				reg = xreg;
+				posi = con;
+			}
+			fread (&xreg, sizeof (proveedor), 1, alias);
+			con++;
+		}
+	}
+	return (posi);
+}
+
+
+
+//**************************************** ELIMINAR ******************************************************************
+
+void ELIMINAR_PROVEEDOR_OK (void)
+{
+	int op, codigo, pos;
+	proveedor reg;
+	system ("cls");
+	cout << "            MENU ELIMINAR PROVEEDOR\n\n";
+	
+	bool sw;	string numCad;
+	do{	
+		cout << "Digite codigo : ";
+		getline(cin, numCad);
+		sw = validaNumero(numCad, codigo);
+	}while (!sw );
+
+	cout << "Modo de la eliminacion: \n";
+	cout << "   1. Eliminacion Logica: \n";
+	cout << "   2. Eliminacion Fisica: \n\n";
+	
+	do{	
+		cout << "Digite Opcion : ";
+		getline(cin, numCad);
+		sw = validaNumero(numCad, op);
+	}while (!((op == 1) || (op == 2) || sw ));
+
+	pos = busquedaProveedor (codigo, reg);
+	if (pos == -1)
+		cout << "No existe el codigo";
+	else
+	{
+		if (op == 1)
+			eliminacionLogica (pos, reg);
+		else
+			eliminacionFisica (pos, reg);
+		cout << "Eliminacion Exitosa";
+	}
+	_getch ();
+}
+
+void eliminacionLogica (int pos, proveedor reg)
+{
+	FILE*alias;
+	alias = fopen ("proveedor.dat","rb+");
+	
+	reg.eli = true;
+
+	fseek (alias, pos*sizeof (reg), SEEK_SET);
+	fwrite (&reg, sizeof (proveedor), 1, alias);
+	fclose (alias);
+}
+
+void eliminacionFisica (int pos, proveedor reg)
+{
+	FILE *p1, *p2;
+	eliminacionLogica (pos, reg);
+	p1 = fopen ("proveedor.dat","rb");
+	p2 = fopen ("temporal.dat","wb");
+	fread (&reg, sizeof (proveedor), 1, p1);
+	while (!feof (p1))
+	{
+		if (reg.eli == false)
+			fwrite (&reg, sizeof (proveedor), 1, p2);
+		fread (&reg, sizeof (proveedor), 1, p1);
+	}
+	fclose (p1);
+	fclose (p2);
+	remove ("proveedor.dat");
+	rename ("temporal.dat","proveedor.dat");
+	remove ("temporal.dat");
+}
+
+
+
+//***************************************************** MOSTRAR *******************************************************************
+
+void MOSTRAR_PROVEEDOR_OK (void)
+{
+	system ("cls");
+	cout << "            MENU MOSTRAR PROVEEDOR\n\n";
+	FILE  *alias;
+	proveedor reg;
+	alias = fopen ("proveedor.dat", "rb");
+	if (alias == NULL)
+	{
+		cout << "No existe el Archivo";
+	}
+	else
+	{
+		cout << "Codigo\t\tNombre\t\tCI\tTelefono\tDireccion\n\n";
+		fread (&reg, sizeof (proveedor), 1, alias);
+		while (!feof (alias))
+		{
+			if (reg.eli == false)
+				mostrarReg (reg);
+			fread (&reg, sizeof (proveedor), 1, alias);
+		}
+		fclose (alias);
+	}
+	_getch ();
+}
+
+void mostrarReg (proveedor reg)
+{
+	cout << setw (7) << reg.cod_prov << setw (18) << reg.nombre << setw (10) << reg.CI << setw (12) 
+		<< reg.fono << setw (18)  << reg.direccion << endl;
+}
+#include "stdafx.h"
+#include <iostream>
+#include "conio.h"
+#include "iomanip"
+#include <string>
+
+using namespace std;
+
+struct regClave{
+	string clave;
+	string nombre;
+	string tipo;	
+	bool eli;
+};
+
+
+bool accesoAdministrador ( void ) 
+{
+	FILE  *alias;
+	regClave reg;
+	alias = fopen ("Auxiliar.dat", "rb");
+	fread(&reg, sizeof(reg), 1, alias);
+	fclose(alias);
+	return(reg.tipo == "ADMINISTRADOR");
+}
+
+
+bool accesoEmpleado ( void ) 
+{
+	FILE  *alias;
+	regClave reg;
+	alias = fopen ("Auxiliar.dat", "rb");
+	fread(&reg, sizeof(reg), 1, alias);
+	fclose(alias);
+	return(reg.tipo == "EMPLEADO");
+}
+
+bool accesoAuxiliar ( void ) 
+{
+	FILE  *alias;
+	regClave reg;
+	alias = fopen ("Auxiliar.dat", "rb");
+	fread(&reg, sizeof(reg), 1, alias);
+	fclose(alias);
+	return(reg.tipo == "AUXILIAR");
+}
+
+//******************************************** PROTOTIPOS ***********************************************
+
+void adicionaClaveInicial(regClave reg);
+void adicionaClaveDefecto(void);
+void inicioSeguridad(void);
+void grabarClaveInicio(string clave);
+bool esSuClave(string clave);
+int menuClaves(void);
+void retardar(void);
+bool esClaveNivel1(string clave);
+bool esClaveNivel1_OK(void);
+string buscaNombreClave(string clave);
+void ADICIONAR_CLAVES_OK (void);
+void pedirDatosClave (regClave &reg);
+void MOSTRAR_CLAVES_OK (void);
+void mostrarReg (regClave reg);
+void MODIFICAR_CLAVES_OK (void);
+int buscaRegClave (string clave, regClave &reg);
+
+//******************************************** SUBPRINCIPAL ************************************************
+
+void SEGURIDAD (void)
+{
+	int op;
+	if (! esClaveNivel1_OK() )	
+		return;
+	
+	do{
+		op = menuClaves();
+		switch (op)
+		{
+			case 1:	ADICIONAR_CLAVES_OK ();
+					break;
+			case 2:	MODIFICAR_CLAVES_OK ();
+					break;
+			/*case 3:	BUSCAR_CLAVES_OK ();
+					break;
+			case 4:	ELIMINAR_CLAVES_OK ();
+					break;*/
+			case 5:	MOSTRAR_CLAVES_OK ();
+					break;
+		}
+	}while (op != 6);
+}
+
+int menuClaves(void)
+{
+	int opcion;
+	system ("cls");
+	cout << "            MENU CLAVES\n\n";
+	cout << "1. Adicionar registro.\n";
+	cout << "2. Modificar registro.\n";
+	cout << "3. Buscar clave por nombre.\n";
+	cout << "4. Eliminar Claves.\n";
+	cout << "5. Mostrar todas las claves\n";
+	cout << "6. Salir.\n\n\n";
+	do{	
+		cout << "\t\t\tDigite opcion: ";
+		cin >> opcion;
+	} while ( ! ( (1 <= opcion) && (opcion <= 6) ) ); 
+
+	return (opcion);
+}
+
+void grabarClaveInicio(string clave)
+{
+	FILE  *alias;
+	regClave reg;
+	int pos = buscaRegClave (clave, reg);
+
+	alias = fopen ("Auxiliar.dat", "wb");
+	fwrite(&reg,sizeof(reg),1, alias);
+	fclose(alias);
+}
+
+void inicioSeguridad (void)  //ok
+{
+	adicionaClaveDefecto();
+	system ("cls");
+	cout << "\n\n\n\n\n\n\n\n";
+	cout << "\t\t\tINTRODUCIR CLAVE(tiene 3 intentos) : \n\n";
+	int con = 1;
+	string clave;
+	do{
+		cout << "\n\t\t\t\t\tintento " << con<< " : ";
+		cin >> clave;
+		con++;
+	}while( (con <= 3) && ( ! esSuClave(clave) ) );
+	
+	if( ! esSuClave( clave ) ){
+		cout << "\n\n\t\t\t!! consulte con su administrador !!\n\n\n\n";
+		system("pause");
+		exit(0);
+	}
+	else
+		grabarClaveInicio(clave);
+}
+
+void adicionaClaveInicial(regClave reg)
+{
+	FILE  *alias;
+	alias = fopen ("claves.dat", "ab+");
+	fwrite(&reg,sizeof(reg),1, alias);
+	fclose(alias);
+}
+
+void adicionaClaveDefecto(void)
+{
+	FILE  *alias;
+	alias = fopen ("claves.dat", "rb");
+	if (alias == NULL){
+		regClave reg;
+		reg.clave = "123abc";
+		reg.nombre = "administrador";
+		reg.tipo = "ADMINISTRADOR";
+		reg.eli = false;
+		adicionaClaveInicial(reg);
+		_getch();
+	}
+	else
+		fclose(alias);
+}
+
+bool esSuClave(string clave)
+{
+	bool sw = false;
+	FILE  *alias;
+	regClave reg;
+	alias = fopen ("claves.dat", "rb");
+	fread(&reg, sizeof(reg), 1, alias);
+	while(! feof(alias) )
+	{
+		if( (clave.compare(reg.clave) == 0) && (reg.eli == false) )
+			sw = true;
+		fread(&reg, sizeof(reg), 1, alias);
+	}
+	fclose(alias);
+	return(sw);
+}
+
+
+void retardar(void)
+{
+	for(int i=-1000; i < 100000000; i++);
+}
+
+bool esClaveNivel1(string clave)
+{
+	bool sw = false;
+	FILE  *alias;
+	regClave reg;
+	alias = fopen ("claves.dat", "rb");
+	fread(&reg, sizeof(reg), 1, alias);
+	while(! feof(alias) )
+	{
+		if( (clave.compare(reg.clave) == 0) && ( reg.tipo == "ADMINISTRADOR") )
+			sw = true;
+		fread(&reg, sizeof(reg), 1, alias);
+	}
+	fclose(alias);
+	return(sw);
+}
+
+string buscaNombreClave(string clave)
+{
+	FILE  *alias;
+	regClave reg;
+	string nombre = " no hay";
+	alias = fopen ("claves.dat", "rb");
+	fread(&reg, sizeof(reg), 1, alias);
+	while(! feof(alias) )
+	{
+		if( clave.compare(reg.clave) == 0 )
+			nombre = reg.nombre;
+		fread(&reg, sizeof(reg), 1, alias);
+	}
+	fclose(alias);
+	return(nombre);
+}
+
+bool esClaveNivel1_OK(void)
+{
+	system ("cls");
+	cout << "\n\n\n\n\n\n\n\n";
+	cout << "\t\t\tINTRODUCIR CLAVE(tiene 3 intentos) : \n\n";
+	int con = 1;
+	string clave;
+	do{
+		cout << "\n\t\t\t\t\tintento " << con<< " : ";
+		cin >> clave;
+		con++;
+	}while( (con <= 3) && ( ! esClaveNivel1(clave) ) );
+
+	if( ! esClaveNivel1(clave) ){
+		cout << "\n\n\t\t\t!! consulte con su administrador !!\n\n\n\n";
+		retardar();
+		return(false);
+	}
+	else{
+		cout << "\t\t\t\t CLAVE CORRECTA " << buscaNombreClave(clave);
+		retardar();
+		return(true);
+	}		
+}
+
+//******************************** ADICIONAR *************
+
+void ADICIONAR_CLAVES_OK (void)
+{
+	system ("cls");
+	cout << "            MENU ADICIONAR CLAVES\n\n";
+	FILE *alias;
+	regClave reg;
+	pedirDatosClave (reg);
+	alias = fopen ("claves.dat", "ab+");
+	fwrite (&reg, sizeof (reg), 1, alias);
+	fclose (alias);
+	_getch ();
+}
+
+void pedirDatosClave (regClave &reg)
+{	
+	string s;
+	cout << "Clave : ";
+	cin.ignore ();  
+	getline(cin, reg.clave);
+	
+	cout << "\n\nNombre: ";
+	getline (cin, reg.nombre);
+
+	cout << "\nTipo de clave : ";
+	cout << "\n\t 1. ADMINISTRADOR.";
+	cout << "\n\t 2. EMPLEADO.";
+	cout << "\n\t 3. AUXILIAR.\n\n";
+	int tipo;
+	do{	
+		cout << "\tDigite tipo de clave : ";
+		cin >> tipo;
+	} while ( ! ( (1 <= tipo) && (tipo <= 3) ) ); 
+	
+	switch(tipo){
+		case 1:	reg.tipo = "ADMINISTRADOR";
+				break;
+		case 2:	reg.tipo = "EMPLEADO";
+				break;
+		case 3:	reg.tipo = "AUXILIAR";
+				break;
+	}
+	reg.eli = false;
+}
+
+//***************************************************** MOSTRAR *******************************************************************
+
+void MOSTRAR_CLAVES_OK (void)
+{
+	system ("cls");
+	cout << "            MENU MOSTRAR CLAVES\n\n";
+	FILE  *alias;
+	regClave reg;
+	alias = fopen ("claves.dat", "rb");
+	if (alias == NULL)
+		cout << "No existe el Archivo";
+	else
+	{
+		cout << setw(8) <<"CLAVES"<< setw(18)<<"NOMBRES"<<setw(18)<<"TIPO\n\n";
+		fread (&reg, sizeof (reg), 1, alias);
+		while (!feof (alias))
+		{
+			if (reg.eli == false)
+				mostrarReg (reg);
+			fread (&reg, sizeof (reg), 1, alias);
+		}
+		fclose (alias);
+	}
+	cout <<"\n\n\n";
+	system("pause");
+}
+
+void mostrarReg (regClave reg)
+{
+	cout << setw (10) << reg.clave << setw (18) << reg.nombre << setw (18) << reg.tipo << endl;
+}
+
+//**************************  MODIFICAR CLAVES
+
+void MODIFICAR_CLAVES_OK (void)
+{
+	int cod, pos;
+	FILE  *alias;
+	regClave reg;
+	system ("cls");
+	cout << "            MENU MODIFICAR CLAVES\n\n";
+	cout << "Codigo de la clave que se va a Modificar: ";
+	cin.ignore();
+	string clave;
+	getline(cin, clave);
+	pos = buscaRegClave(clave, reg);
+	if (pos == -1) {
+		cout << "No existe la clave a buscar ";
+		return;
+	}
+	
+	cout << setw(8) <<"CLAVES"<< setw(18)<<"NOMBRES"<<setw(18)<<"TIPO\n\n";
+	mostrarReg (reg);
+	pedirDatosClave(reg);
+
+	fseek (alias, pos*sizeof (reg), SEEK_SET);
+	fwrite (&reg, sizeof (reg), 1, alias);
+	fclose (alias);
+	cout << "Registro Modificado";
+	_getch ();
+}
+
+//**********************  FUNCIONES COMUNES A VARIAS FUNCIONES
+
+int buscaRegClave (string clave, regClave &reg)
+{
+	int posi, con;
+	FILE  *alias;
+	regClave xreg;
+	alias = fopen ("claves.dat", "rb+");
+	posi = -1;
+	if (alias == NULL)
+			cout << "No Existe Archivo";
+	else
+	{
+		con = 0;
+		fread (&xreg, sizeof (regClave), 1, alias);
+		while (!feof (alias))
+		{
+			if (( clave.compare (xreg.clave) == 0 ) && (xreg.eli == false))
+			{
+				reg = xreg;
+				posi = con;
+			}
+			fread (&xreg, sizeof (regClave), 1, alias);
+			con++;
+		}
+	}
+	return (posi);
+}
+#include "stdafx.h"
+#include <iostream>
+#include "conio.h"
+#include "iomanip"
+#include <string>
+
+using namespace std;
+
+
+//*****  PROTOTIPOS
+bool validarNumero(string numero);
+bool validaFecha(string fecha);
+//**************************  FUNCIONES
+bool validarFecha(string fecha)
+{
+	return(true);
+}
+bool esnumero(string cad)
+{
+	bool sw = true;
+	for(int i = 0; i < cad.length(); i++)
+	{
+		if(! isdigit(cad.at(i)) )
+			sw = false;
+	}
+	return(sw);
+}
+
+bool convertirFechaDMA(string fecha, int &dia,int &mes,int &ano)
+{
+	char aux[50];
+	int n =0;
+	dia = -1; mes = -1; ano = -1;
+	string diaCad, mesCad, anoCad, numCad;
+	
+
+	diaCad = fecha.substr(0,2);
+	mesCad = fecha.substr(3,2);
+	anoCad = fecha.substr(6,4);
+	
+	bool sw ;
+
+	if( esnumero(diaCad) && esnumero(mesCad) && esnumero(anoCad) && (fecha.length() == 10)&&
+		(fecha.at(2) == '/') && (fecha.at(5) == '/') )
+	{
+		sw = true;
+		dia = atoi(diaCad.c_str());
+		mes = atoi(mesCad.c_str());
+		ano = atoi(anoCad.c_str());
+	}
+	else
+		sw = false;
+	return(sw);
+}
+bool validaFecha(string fecha)
+{
+	char aux[50];
+	bool sw = true;
+	int dia, mes , ano, i = 0, n = 0;
+	
+	sw = convertirFechaDMA(fecha, dia, mes, ano);
+
+	return(sw);
+}
+
+bool validaNumero(string numCad, int &num) 
+{
+	char aux[50];
+	bool sw = true;
+	int i = 0, n = 0;
+	while(  (i < numCad.length()) && ( sw) )
+	{
+		if( ! isdigit(numCad.at(i) ) )
+			sw = false;
+		else{
+			aux[n] = numCad.at(i);
+			n++;
+		}
+		i++;
+	}
+	aux[n] = '\0';
+	if( sw)
+		num = atoi(aux);
+	else
+		num = -1;
+	return(sw);
+}
+#include "stdafx.h"
+#include <iostream>
+#include "conio.h"
+#include "iomanip"
+#include <string>
+
+using namespace std;
+
+struct detalleVenta
+{
+	int codVenta;
+	int codProd;
+	string detalleVen;
+	float pu;
+	int cantidad;
+	float subtotal;
+};
+struct venta 
+{
+	int cod_venta;
+	int nro_comprobante;
+	int cod_cli;  //proveedor
+	string fecha;  
+	int cod_pro;  //producto
+	float PU;
+	int cantidad;
+	bool eli;
+};
+
+//******************************************** PROTOTIPOS ***********************************************
+
+int generarCodComprobanteVen (void);
+bool validarFecha(string fecha);
+int generarCodVenta(void);
+
+//******************************************** MENU PRINCIPAL ***********************************************
+void tituloVentas(int comprobante, string fecha, string nombre, string ci)
+{
+	system("cls");
+	cout << "            MENU VENTAS\n\n";
+	cout << "\nNro. de comprobante: " << comprobante;
+	cout << "\nFecha              : " << fecha;
+	cout << "\nNombre Cliente   : " << nombre;
+	cout << "\nNIT                : " << ci<< endl<<endl<<endl;
+	cout<< "Cod_Venta    Cod_Prod  Detalle      PV      Canti    Sub \n";
+	cout<< "========================================================= \n\n";
+}
+
+void imprimirDetalle(detalleVenta V[], int n)
+{
+	for(int i = 0; i < n ; i++)
+	{
+		cout<<V[i].codVenta <<"  "<<V[i].codProd<<"  "<<V[i].detalleVen <<"  "<<V[i].pu<<"  "
+			<<V[i].cantidad<<"  "<<V[i].subtotal<<endl;
+	}
+}
+
+void cambiarCanProducto(int pos,int cantidad)
+{
+	FILE  *alias;
+	producto reg;
+	
+	alias = fopen ("Productos.dat", "rb+");
+	fseek (alias, pos*sizeof (reg), SEEK_SET);
+	fread (&reg, sizeof (reg), 1, alias);
+	fseek (alias, pos*sizeof (reg), SEEK_SET);
+
+	 reg.cantidad = reg.cantidad - cantidad;
+	
+	fwrite (&reg, sizeof (reg), 1, alias);
+	fclose (alias);	
+}
+
+int buscarRegAdicionadoCliente (cliente &reg)
+{
+	FILE  *alias;
+	int pos = -1;
+	alias = fopen ("cliente.dat", "rb+");
+	
+	fread (&reg, sizeof (reg), 1, alias);
+	while(!feof(alias))
+	{
+		pos++;
+		fread (&reg, sizeof (reg), 1, alias);
+	}
+	fclose(alias);
+	return(pos);
+}
+
+
+void VENTAS (void)
+{
+	if(  ! (  accesoAdministrador() || accesoEmpleado() )  ) {
+		cout << "\n\n\n\n\t\t\t!! NO TIENE ACCESO !!";
+		_getch();
+		return;
+	}
+
+	system("cls");
+	cout << "            M E N U     V E N T A S  \n\n";
+	venta regVenta;	cliente regCliente;		string nombre, fecha;
+	int comprobante;
+	comprobante = generarCodComprobanteVen();
+	
+	cout << "Nro. de comprobante: " << comprobante;
+	do{
+		cout << "\nFecha: ";
+		cin.ignore();		getline(cin,fecha);
+	}while (!validarFecha (fecha));
+	
+	cout << "\nNombre Cliente : ";		getline (cin, nombre);
+	int nroReg;
+	if (buscarNomCliente (nombre, regCliente) == -1)
+	{
+		ADICIONAR_CLIENTES_OK();
+		nroReg = buscarRegAdicionadoCliente (regCliente);	
+	}
+	//******************************  detalle Ventas  **********************
+	char seguir;	int codVenta, codPro, nroDet = 1;	producto regProducto;
+	detalleVenta V[10];	int n = 0, precio, cantidad, suma = 0;
+	FILE *alias;
+
+	do{
+		tituloVentas(comprobante, fecha, regCliente.nombre, regCliente.CI);
+		cout << "\ndetalle "<< nroDet << endl;
+		nroDet++;
+		codVenta = generarCodVenta();
+		cout << "Codigo venta    : " << codVenta << endl;
+		cout << "Codigo producto : ";	cin >> codPro;
+		
+		if ( busquedaProducto (codPro, regProducto) == -1) {
+			cout << " No existe el producto solicitado\n";
+			nroDet--;
+		}
+		else{
+			nroReg = busquedaProducto (codPro, regProducto);
+			precio = regProducto.PU * 1.4;
+			cout << "Precio Unitario : " << precio;
+			cout << "\nCantidad        : ";	cin >> cantidad;
+
+			if(regProducto.cantidad < cantidad ){
+				cout << " No tenemos esa cantidad !! \n";
+				cout << " La cantida que queda en stock es " << regProducto.cantidad<<endl;
+				nroDet--;
+			}
+			else{
+				cambiarCanProducto(nroReg, cantidad); //chano
+			
+				V[n].codVenta   = codVenta;				V[n].codProd    = regProducto.cod_pro;
+				V[n].detalleVen = regProducto.detalle;	V[n].pu         = precio;
+				V[n].cantidad   = cantidad;				V[n].subtotal   = precio * cantidad;
+				suma = suma + V[n].subtotal;			n++;
+				tituloVentas(comprobante, fecha, regCliente.nombre, regCliente.CI);
+				imprimirDetalle(V,n);
+
+				regVenta.cod_venta = codVenta;				regVenta.nro_comprobante = comprobante;
+				regVenta.cod_cli = regCliente.cod_clien;	regVenta.fecha = fecha;
+				regVenta.PU = precio;						regVenta.cantidad = cantidad;
+				regVenta.cod_pro = regProducto.cod_pro;		regVenta.eli = false;
+				alias = fopen ("ventas.dat", "ab+");
+				fwrite(&regVenta,sizeof(venta),1,alias);
+				fclose(alias);
+			}
+		}
+		do{
+			cout << "Desea continuar comprando (s/n): ";
+			cin >> seguir;
+		}while( (toupper(seguir)!='S') &&  (toupper(seguir)!='N') );
+	}while(toupper(seguir) == 'S');
+	cout <<"                        TOTAL  ---> " << suma<< endl << endl;
+	system ("pause");
+}
+
+//******************************************** FUNCIONES ************************************************
+
+int generarCodVenta(void)
+{
+	int cod;
+	FILE *ptr;
+	venta reg;
+	ptr = fopen ("venta.dat", "rb+");
+	if (ptr == NULL)
+	{
+		cod = 1;
+	}
+	else
+	{
+		fread (&reg, sizeof (venta), 1, ptr);
+		while (!feof (ptr))
+			fread (&reg, sizeof (venta), 1, ptr);
+		cod = reg.cod_venta + 1;
+		fclose (ptr);
+	}
+	return (cod);
+}
+
+
+//********
+int generarCodComprobanteVen (void)
+{
+	int cod;
+	FILE *ptr;
+	venta reg;
+	ptr = fopen ("ventas.dat", "rb+");
+	if (ptr == NULL) {
+		cod = 100;
+	}
+	else {
+		fread (&reg, sizeof (venta), 1, ptr);
+		while (!feof (ptr))
+			fread (&reg, sizeof (venta), 1, ptr);
+		cod = reg.nro_comprobante+ 1;
+		fclose (ptr);
+	}
+	return (cod);
+}
+
+
+
+
+
