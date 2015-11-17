@@ -1,0 +1,28 @@
+// ejemplo texto.cpp : Defines the entry point for the console application.
+//
+
+#include "stdafx.h"
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+int main()
+{
+
+FILE *arch;
+arch=fopen("parcial.txt", "a");
+char palabras[1000];
+int n;
+float numero;
+cout<<"Ingrese el numero de lineas que desea ingresar: ";
+cin>>n;
+cin.ignore();
+for (int i=0;i<n;i++)
+{
+  cout<< "Digite unas Palabras: ";
+  fgets(palabras, 1000, stdin);
+  fputs(palabras, arch);
+}
+return 0;
+}
